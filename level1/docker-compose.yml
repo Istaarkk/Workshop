@@ -1,0 +1,10 @@
+version: "3.9"
+
+services:
+  level1:
+    build: .                  # même dossier que ton Dockerfile
+    container_name: level1
+    ports:
+      - "1337:1337"           # expose le port du socat
+    restart: unless-stopped
+
