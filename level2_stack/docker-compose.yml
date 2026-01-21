@@ -1,8 +1,7 @@
 version: "3.8"
-
 services:
-  pwn:
+  chall:
     build: .
     ports:
-      - "9999:9999"
+      - "1337:1337"
     restart: unless-stopped

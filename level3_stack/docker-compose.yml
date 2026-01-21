@@ -1,0 +1,10 @@
+services:
+  level3_stack:
+    build: .
+    container_name: level3_stack
+    ports:
+      - "1337:1337"
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+

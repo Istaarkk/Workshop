@@ -1,15 +1,21 @@
-FROM debian:bookworm-slim
+FROM ubuntu:22.04
 
 RUN apt-get update \
- && apt-get install -y --no-install-recommends socat \
- && rm -rf /var/lib/apt/lists/*
+    && apt-get install -y --no-install-recommends socat \
+    && rm -rf /var/lib/apt/lists/*
 
-WORKDIR /service
+WORKDIR /home/ctf
+COPY vuln /home/ctf/vuln
+RUN chmod 755 /home/ctf/vuln
 
-COPY vuln       ./vuln
-COPY flag.txt   ./flag.txt
-COPY docker-entrypoint.sh /usr/local/bin/entrypoint.sh
-RUN chmod +x /usr/local/bin/entrypoint.sh
+RUN useradd -m ctf
+COPY flag.txt /home/ctf/flag.txt
+RUN chown root:ctf /home/ctf/flag.txt \
+    && chmod 640 /home/ctf/flag.txt
 
-EXPOSE 1337
-ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+COPY start.sh /start.sh
+RUN chmod 755 /start.sh
+
+EXPOSE 9999
+USER ctf
+CMD ["/start.sh"]

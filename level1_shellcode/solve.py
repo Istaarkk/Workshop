@@ -3,6 +3,7 @@
 from pwn import *
 
 exe = ELF("./chall")
+#nc 127.0.0.1 1337
 
 context.binary = exe
 
@@ -13,7 +14,7 @@ def conn():
         if args.DEBUG:
             gdb.attach(r)
     else:
-        r = remote("addr", 1337)
+        r = remote("127.0.0.1", 1337)
 
     return r
 

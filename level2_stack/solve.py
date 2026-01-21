@@ -4,12 +4,14 @@ import subprocess
 
 context.binary = exe = ELF('./chall')
 context.log_level = "debug"
-
+#nc 127.0.0.1 1337
 def conn():
-    p = process(exe.path)
-    if args.GDB:
-        subprocess.call(["gdb", "-q", exe.path, "-p", str(p.pid)])
-
+    if args.LOCAL:
+        p = process(exe.path)                
+        if args.DEBUG:
+            gdb.attach(p)
+    else:
+        p = remote("127.0.0.1", 1337)
     return p
 
 win = exe.sym["call_me"]

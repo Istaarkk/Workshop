@@ -1,0 +1,11 @@
+version: "3.8"
+
+services:
+  chall:
+    build:
+      context: .
+      args:
+        FLAG: "CTF{dummy_flag}"
+    ports:
+      - "1337:1337"
+    restart: unless-stopped

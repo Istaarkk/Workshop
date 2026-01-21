@@ -22,7 +22,7 @@ def conn():
         if args.DEBUG:
             gdb.attach(r, gdbscript="b *main+61")  
     else:
-        r = remote("addr", 1337)
+        r = remote("127.0.0.1", 1337)
     return r
 
 def main():
